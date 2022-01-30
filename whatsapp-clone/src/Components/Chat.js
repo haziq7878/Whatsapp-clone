@@ -5,14 +5,23 @@ import { MdAttachFile } from "react-icons/md";
 import { FiMoreVertical } from "react-icons/fi";
 import { BsEmojiLaughing } from "react-icons/bs";
 import { BsFillMicFill } from "react-icons/bs";
-
-
-
 import "./Chat.css";
+import { useParams } from 'react-router-dom';
+import Db from '../firebases';
 
 function Chat() {
     const [input, setInput] = useState('')
     const [seed, setSeed] = useState('');
+    const roomID = useParams();
+    const [roomName, setRoomName] = useState('');
+
+    // useEffect(() => {
+    //     if (roomID) {
+    //         Db.collection('room').doc(roomID).onSnapshot(snapshot =>
+    //         (setRoomName(snapshot.data().name)
+    //         ))
+    //     }
+    // }, [roomID])
 
     useEffect(() => {
         setSeed(Math.floor(Math.random() * 5000))
@@ -29,7 +38,7 @@ function Chat() {
             <div className='chat__header'>
                 <Avatar src={`https://robohash.org/${seed}.png`} />
                 <div className='chat__headerInfo'>
-                    <h3>Room name</h3>
+                    <h3>{roomName}</h3>
                     <p>Last seen at...</p>
                 </div>
                 <div className='chat__headerRight'>

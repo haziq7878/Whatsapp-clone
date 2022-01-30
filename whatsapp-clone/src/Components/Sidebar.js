@@ -14,10 +14,10 @@ import db from '../firebases'
 
 export default function Sidebar() {
   const [rooms, setRooms] = useState([]);
-  console.log(rooms)
+  
 
   useEffect(() => {
-    db.collection('rooms').onSnapshot(snapshot => (
+    const unsubscribe = db.collection('rooms').onSnapshot(snapshot => (
       setRooms(snapshot.docs.map(doc => (
         {
           id: doc.id,
@@ -26,6 +26,10 @@ export default function Sidebar() {
       )
       ))
     ))
+
+    return ()=>{
+      unsubscribe();
+    }
   }, [])
 
 
