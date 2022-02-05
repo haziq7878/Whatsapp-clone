@@ -14,7 +14,7 @@ function App() {
         <Router>
         <Sidebar />
           <Routes >
-            <Route exact path="/rooms/:roomID" element={<Home/>}/>
+            <Route exact path="/rooms/:roomID" element={<Chat/>}/>
             <Route exact path="/" element={<Chat/>}/>
           </Routes>
         </Router>

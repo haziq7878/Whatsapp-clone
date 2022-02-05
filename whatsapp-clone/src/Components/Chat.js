@@ -1,5 +1,5 @@
 import { Avatar, IconButton } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { BiSearchAlt2 } from "react-icons/bi";
 import { MdAttachFile } from "react-icons/md";
 import { FiMoreVertical } from "react-icons/fi";
@@ -12,16 +12,57 @@ import Db from '../firebases';
 function Chat() {
     const [input, setInput] = useState('')
     const [seed, setSeed] = useState('');
-    const roomID = useParams();
+    const roomId = useParams();
     const [roomName, setRoomName] = useState('');
+    const [rooms, setRooms] = useState([]);
+    const [message, setMessages] = useState();
+
+
+    useEffect(() => {
+        setSeed(Math.floor(Math.random() * 5000));
+        if (roomId) {
+          Db.collection("rooms")
+            .doc(roomId.roomID)
+            .onSnapshot((snapshot) => {
+              setRoomName(snapshot.data().name);
+            });
+
+        //   Db.collection("rooms")
+        //     .doc(roomId)
+        //     .collection("messages")
+        //     .orderBy("timestamp", "asc")
+        //     .onSnapshot((snapshot) => {
+        //       setMessages(snapshot.docs.map((doc) => doc.data()));
+        //     });
+        }
+      }, [roomId]);
 
     // useEffect(() => {
-    //     if (roomID) {
-    //         Db.collection('room').doc(roomID).onSnapshot(snapshot =>
-    //         (setRoomName(snapshot.data().name)
+    //     Db.collection('rooms').onSnapshot(snapshot => (
+    //         setRooms(snapshot.docs.map(doc => (
+    //             {
+    //                 id: doc.id,
+    //                 data: doc.data(),
+    //             }
+    //         )
     //         ))
-    //     }
-    // }, [roomID])
+    //     ))
+
+    //     rooms.map(rooms => {
+    //         if (roomId.roomID === rooms.id) {
+    //             console.log("matched")
+    //             setRoomName(rooms.data.name)
+    //         }
+    //     })
+        // Db.collection("rooms")
+        //     .doc(roomId)
+        //     .collection("messages")
+        //     .orderBy("timestamp", "asc")
+        //     .onSnapshot((snapshot) => {
+        //         setMessages(snapshot.docs.map((doc) => doc.data()));
+        //     });
+
+    // }, [roomId])
 
     useEffect(() => {
         setSeed(Math.floor(Math.random() * 5000))
