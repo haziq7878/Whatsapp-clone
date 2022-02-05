@@ -1,5 +1,5 @@
 import { Avatar, IconButton } from '@material-ui/core';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState} from 'react';
 import { BiSearchAlt2 } from "react-icons/bi";
 import { MdAttachFile } from "react-icons/md";
 import { FiMoreVertical } from "react-icons/fi";

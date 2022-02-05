@@ -1,16 +1,22 @@
 import './App.css';
 import Sidebar from './Components/Sidebar';
 import { BrowserRouter as Router, Routes,Route } from 'react-router-dom';
-import Home from './Home';
 import Login from './Login';
 import Chat from './Components/Chat';
+import { useState } from 'react';
+import { useStateValue } from './StateProvider';
 
 
 function App() {
+  // const [user,setUser] = useState(null);
+  const [{user},dispatch] = useStateValue();
   return (
     // Ben naming convention
     <div className="App">
-      <div className="app_body">
+      {!user ?(
+        <Login/>
+      ):(
+        <div className="app_body">
         <Router>
         <Sidebar />
           <Routes >
@@ -19,6 +25,7 @@ function App() {
           </Routes>
         </Router>
       </div>
+      )}
     </div>
   );
 }
