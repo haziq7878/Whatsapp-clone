@@ -10,10 +10,12 @@ import { BsFillChatFill } from "react-icons/bs";
 import { BiSearch } from "react-icons/bi";
 import SidebarChat from './SidebarChat';
 import db from '../firebases'
+import { useStateValue } from '../StateProvider';
 
 
 export default function Sidebar() {
   const [rooms, setRooms] = useState([]);
+  const [{user},dispatch] = useStateValue();
   
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function Sidebar() {
   return (
     <div className='sidebar'>
       <div className='sidebar__header'>
-        <Avatar />
+        <Avatar src={user?.photoURL}/>
         <div className='sidebar__headerRight'>
           <IconButton>
             <MdDonutLarge />

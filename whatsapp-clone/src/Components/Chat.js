@@ -1,5 +1,5 @@
 import { Avatar, IconButton } from '@material-ui/core';
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { BiSearchAlt2 } from "react-icons/bi";
 import { MdAttachFile } from "react-icons/md";
 import { FiMoreVertical } from "react-icons/fi";
@@ -8,34 +8,38 @@ import { BsFillMicFill } from "react-icons/bs";
 import "./Chat.css";
 import { useParams } from 'react-router-dom';
 import Db from '../firebases';
+import { useStateValue } from '../StateProvider';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 function Chat() {
+    const [{ user }, dispatch] = useStateValue();
     const [input, setInput] = useState('')
     const [seed, setSeed] = useState('');
     const roomId = useParams();
     const [roomName, setRoomName] = useState('');
     const [rooms, setRooms] = useState([]);
-    const [message, setMessages] = useState();
+    const [messages, setMessages] = useState();
 
 
     useEffect(() => {
         setSeed(Math.floor(Math.random() * 5000));
         if (roomId) {
-          Db.collection("rooms")
-            .doc(roomId.roomID)
-            .onSnapshot((snapshot) => {
-              setRoomName(snapshot.data().name);
-            });
+            Db.collection("rooms")
+                .doc(roomId.roomID)
+                .onSnapshot((snapshot) => {
+                    setRoomName(snapshot.data().name);
+                });
 
-        //   Db.collection("rooms")
-        //     .doc(roomId)
-        //     .collection("messages")
-        //     .orderBy("timestamp", "asc")
-        //     .onSnapshot((snapshot) => {
-        //       setMessages(snapshot.docs.map((doc) => doc.data()));
-        //     });
+            Db.collection("rooms")
+                .doc(roomId.roomID)
+                .collection("messages")
+                .orderBy("timestamp", "asc")
+                .onSnapshot((snapshot) => {
+                    setMessages(snapshot.docs.map((doc) => doc.data()));
+                });
         }
-      }, [roomId]);
+    }, [roomId]);
 
     // useEffect(() => {
     //     Db.collection('rooms').onSnapshot(snapshot => (
@@ -54,13 +58,13 @@ function Chat() {
     //             setRoomName(rooms.data.name)
     //         }
     //     })
-        // Db.collection("rooms")
-        //     .doc(roomId)
-        //     .collection("messages")
-        //     .orderBy("timestamp", "asc")
-        //     .onSnapshot((snapshot) => {
-        //         setMessages(snapshot.docs.map((doc) => doc.data()));
-        //     });
+    // Db.collection("rooms")
+    //     .doc(roomId)
+    //     .collection("messages")
+    //     .orderBy("timestamp", "asc")
+    //     .onSnapshot((snapshot) => {
+    //         setMessages(snapshot.docs.map((doc) => doc.data()));
+    //     });
 
     // }, [roomId])
 
@@ -70,7 +74,12 @@ function Chat() {
 
     const sendMessage = (e) => {
         e.preventDefault();
-        console.log("Your type", input);
+        Db.collection('rooms').doc(roomId.roomID).collection('messages')
+            .add({
+                message: input,
+                name: user.displayName,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            });
         setInput('');
     }
 
@@ -80,7 +89,10 @@ function Chat() {
                 <Avatar src={`https://robohash.org/${seed}.png`} />
                 <div className='chat__headerInfo'>
                     <h3>{roomName}</h3>
-                    <p>Last seen at...</p>
+                    <p>last seen
+                        {messages? new Date(
+                            messages[messages.length - 1]?.timestamp?.toDate()
+                        ).toUTCString():""}</p>
                 </div>
                 <div className='chat__headerRight'>
                     <IconButton>
@@ -95,11 +107,15 @@ function Chat() {
                 </div>
             </div>
             <div className='chat__body'>
-                <p className={`chat__message ${true && 'chat__recevier'}`}>
-                    <span className='chat__name'>Haziq</span>
-                    Hey guys
-                    <span className='chat__timestamp'>3.32pm</span>
-                </p>
+                {messages?.map(message => (
+                    <p className={`chat__message ${message.name === user.displayName && 'chat__recevier'}`}>
+                        <span className='chat__name'>{message.name}</span>
+                        {message.message}
+                        <span className='chat__timestamp'>
+                            {new Date(message?.timestamp?.toDate()).toUTCString()}
+                        </span>
+                    </p>
+                ))}
             </div>
             <div className='chat__footer'>
                 <IconButton>
